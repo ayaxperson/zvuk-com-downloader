@@ -46,7 +46,7 @@ public class Main {
 
         final Options options = new Options();
 
-        options.addOption("id", true, "ID");
+        options.addOption("id", true, "ID of the desired track/artist");
         options.addOption("action", true, "Action (downloadTrack, downloadDiscography)");
         options.addOption("authToken", true, "Authentication Token");
 
