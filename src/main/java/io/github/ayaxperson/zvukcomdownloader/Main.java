@@ -2,16 +2,15 @@ package io.github.ayaxperson.zvukcomdownloader;
 
 import com.mpatric.mp3agic.ID3v23Tag;
 import com.mpatric.mp3agic.Mp3File;
-import io.github.ayaxperson.zvukcomdownloader.api.Zvuk;
 import io.github.ayaxperson.zvukcomdownloader.api.Album;
-import io.github.ayaxperson.zvukcomdownloader.api.Track;
 import io.github.ayaxperson.zvukcomdownloader.api.Artist;
+import io.github.ayaxperson.zvukcomdownloader.api.Track;
+import io.github.ayaxperson.zvukcomdownloader.api.Zvuk;
 import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,8 +76,6 @@ public class Main {
             System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
         }
     }
-
-    private static final DecimalFormat FORMAT_TO_2_DECIMALS = new DecimalFormat("##");
 
     private static void downloadTrack(final String id, final String authToken) {
         System.out.println("Downloading temp mp3");
@@ -179,7 +176,7 @@ public class Main {
 
         final ID3v23Tag tag = new ID3v23Tag();
 
-        final String trackTag = FORMAT_TO_2_DECIMALS.format(Objects.notNull(trackInfo.position()).intValue());
+        final String trackTag = String.format("%02d", Objects.notNull(trackInfo.position()));
         tag.setTrack(trackTag);
         tag.setArtist(Artist.toString(trackInfo.artists()));
         tag.setTitle(trackInfo.title());
