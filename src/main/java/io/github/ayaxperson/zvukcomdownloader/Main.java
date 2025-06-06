@@ -82,7 +82,7 @@ public class Main {
 
     private static void downloadTrack(final String id, final String authToken) {
         System.out.println("Downloading temp mp3");
-        final Path tempPath = Path.of(String.format("temp-%s-%d.mp3", id, Math.round(Math.random() * 10000)));
+        final Path tempPath = Path.of(String.format("temp-%s-%d%d%d.mp3", id, Math.round(Math.random() * 10000), Math.round(Math.random() * 10000), Math.round(Math.random() * 10000)));
         TEMP_FILES.add(tempPath);
         try {
             Zvuk.downloadTrack(authToken, id, tempPath);
@@ -111,7 +111,7 @@ public class Main {
         final Map<String, Path> trackPathMap = new HashMap<>();
 
         for (final Track track : tracks) {
-            final Path tempPath = Path.of(String.format("temp-%s-%d.mp3", id, Math.round(Math.random() * 10000)));
+            final Path tempPath = Path.of(String.format("temp-%s-%d%d%d.mp3", id, Math.round(Math.random() * 10000), Math.round(Math.random() * 10000), Math.round(Math.random() * 10000)));
             TEMP_FILES.add(tempPath);
             trackPathMap.put(track.id(), tempPath);
         }
@@ -192,7 +192,7 @@ public class Main {
 
         System.out.println("Writing final file");
         try {
-            mp3File.save(String.format("%s - %s.mp3", trackInfo, trackInfo.title()));
+            mp3File.save(String.format("%s - %s.mp3", trackTag, trackInfo.title()));
         } catch (final Exception e) {
             System.err.println("Failed to save mp3 file");
             System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
