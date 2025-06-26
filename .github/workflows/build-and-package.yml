@@ -35,7 +35,7 @@ jobs:
           $TEMP_PATH = "temp"
 
           jpackage `
-            --type exe `
+            --type app-image `
             --input "$($JAR_PATH.DirectoryName)" `
             --temp "$TEMP_PATH" `
             --dest "$OUTPUT_DIR" `
