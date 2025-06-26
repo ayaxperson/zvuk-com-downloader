@@ -1,0 +1,49 @@
+name: Build and Package with jpackage
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 24
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        shell: bash
+
+      - name: Build fat JAR with Shadow plugin
+        run: ./gradlew shadowJar
+
+      - name: Package with jpackage
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $JAR_PATH = Get-ChildItem -Recurse -Filter "*-all.jar" | Select-Object -First 1
+          $OUTPUT_DIR = "dist"
+
+          jpackage `
+            --type exe `
+            --input "$($JAR_PATH.DirectoryName)" `
+            --dest "$OUTPUT_DIR" `
+            --name "ZvukComDownloader" `
+            --main-jar "$($JAR_PATH.Name)" `
+            --main-class "$MAIN_CLASS" `
+            --win-console
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ZvukComDownloader
+          path: dist/*.exe
