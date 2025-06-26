@@ -32,14 +32,15 @@ jobs:
 
           $JAR_PATH = Get-ChildItem -Recurse -Filter "*-all.jar" | Select-Object -First 1
           $OUTPUT_DIR = "dist"
+          $TEMP_PATH = "temp"
 
           jpackage `
             --type exe `
             --input "$($JAR_PATH.DirectoryName)" `
+            --temp "$TEMP_PATH" `
             --dest "$OUTPUT_DIR" `
             --name "ZvukComDownloader" `
             --main-jar "$($JAR_PATH.Name)" `
-            --main-class "$MAIN_CLASS" `
             --win-console
 
       - name: Upload EXE artifact
