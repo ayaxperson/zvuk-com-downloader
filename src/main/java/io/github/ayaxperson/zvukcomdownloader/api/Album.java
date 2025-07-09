@@ -64,6 +64,19 @@ public record Album(
             }
         }
 
+        if (jsonObject.containsKey("tracks")) {
+            final JSONArray tracks = jsonObject.getJSONArray("tracks");
+
+            for (int i = 0; i < tracks.size(); i++) {
+                final JSONObject trackObject = (JSONObject) tracks.get(i);
+
+                if (trackObject.containsKey("id")) {
+                    final String trackId = trackObject.getString("id");
+                    Zvuk.trackIndexMap.put(trackId, i + 1);
+                }
+            }
+        }
+
         return new Album(id, title, coverSrc, genres, date, artists);
     }
 

@@ -3,14 +3,13 @@ package io.github.ayaxperson.zvukcomdownloader.api;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public record Track(
         @NotNull String id,
         @NotNull String title,
         @NotNull Album album,
         @NotNull Artist[] artists,
-        @Nullable Integer position
+        @NotNull Integer position
     ) {
 
     public static Track build(final JSONObject jsonObject) {
@@ -49,6 +48,17 @@ public record Track(
 
         if (jsonObject.containsKey("position"))
             position = jsonObject.getInteger("position");
+
+        if (position == null) {
+            if (Zvuk.trackIndexMap.containsKey(id)) {
+                position = Zvuk.trackIndexMap.get(id);
+            } else {
+                try {
+                    Zvuk.fetchAlbumInfo(album.id());
+                } catch (final Exception ignored) { }
+                position = Zvuk.trackIndexMap.getOrDefault(id, 1);
+            }
+        }
 
         return new Track(id, title, album, artistsArray, position);
     }
