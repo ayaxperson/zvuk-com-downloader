@@ -7,6 +7,7 @@ A tool for downloading from zvuk.com.
 ```
 -t, track           Download a track (parameter: id)
 -d, discography     Download all released tracks of an artist (parameter: id)
+-r  release         Download all tracks from a release - album (paramater: id)
 -a, authToken       Authentication Token
 ```
 

@@ -11,7 +11,8 @@ public record Album(
         @Nullable String coverSrc,
         @Nullable String[] genres,
         @Nullable String date,
-        @Nullable Artist[] artists
+        @Nullable Artist[] artists,
+        @Nullable String[] trackIds
 ) {
 
     public static Album build(final JSONObject jsonObject) {
@@ -64,8 +65,11 @@ public record Album(
             }
         }
 
+        final String[] trackIds;
+
         if (jsonObject.containsKey("tracks")) {
             final JSONArray tracks = jsonObject.getJSONArray("tracks");
+            trackIds = new String[tracks.size()];
 
             for (int i = 0; i < tracks.size(); i++) {
                 final JSONObject trackObject = (JSONObject) tracks.get(i);
@@ -73,13 +77,19 @@ public record Album(
                 if (trackObject.containsKey("id")) {
                     final String trackId = trackObject.getString("id");
                     Zvuk.trackIndexMap.put(trackId, i + 1);
+                    trackIds[i] = trackId;
                 }
             }
+        } else {
+            trackIds = null;
         }
 
-        return new Album(id, title, coverSrc, genres, date, artists);
+        return new Album(id, title, coverSrc, genres, date, artists, trackIds);
     }
 
+    /**
+     * This does not check for track ids!
+     */
     public boolean limitedData() {
         return genres == null || coverSrc == null || date == null || artists == null;
     }

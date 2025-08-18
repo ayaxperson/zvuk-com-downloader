@@ -10,14 +10,14 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public record DownloadDiscography(String id, String authToken) implements Runnable {
+public record DownloadAlbum(String id, String authToken) implements Runnable {
 
     public void run() {
         System.out.printf("[%s] Fetching tracks%n", id);
         Track[] tracks;
 
         try {
-            tracks = Zvuk.fetchTracksFromProfile(id, authToken);
+            tracks = Zvuk.fetchTracksFromAlbum(id);
         } catch (final Exception e) {
             System.err.printf("[%s] Failed to fetch tracks", id);
             System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());

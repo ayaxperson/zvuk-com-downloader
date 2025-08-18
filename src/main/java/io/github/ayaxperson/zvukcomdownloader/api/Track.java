@@ -30,7 +30,7 @@ public record Track(
         Album album = Album.build(albumJsonObject);
 
         if (jsonObject.containsKey("coverSrc") && album.coverSrc() == null) {
-            album = new Album(album.id(), album.title(), jsonObject.getString("coverSrc"), album.genres(), album.date(), album.artists());
+            album = new Album(album.id(), album.title(), jsonObject.getString("coverSrc"), album.genres(), album.date(), album.artists(), album.trackIds());
         }
 
         if (!jsonObject.containsKey("artists"))

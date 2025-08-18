@@ -1,5 +1,6 @@
 package io.github.ayaxperson.zvukcomdownloader;
 
+import io.github.ayaxperson.zvukcomdownloader.action.DownloadAlbum;
 import io.github.ayaxperson.zvukcomdownloader.action.DownloadDiscography;
 import io.github.ayaxperson.zvukcomdownloader.action.DownloadTrack;
 import io.github.ayaxperson.zvukcomdownloader.api.Zvuk;
@@ -53,6 +54,12 @@ public class Main {
                 .hasArg()
                 .build());
         options.addOption(Option.builder()
+                .argName("Download release (album) (parameter ID)")
+                .option("r")
+                .longOpt("release")
+                .hasArg()
+                .build());
+        options.addOption(Option.builder()
                 .argName("Authentication Token")
                 .option("a")
                 .longOpt("authToken")
@@ -77,6 +84,9 @@ public class Main {
 
             if (cmd.hasOption("track"))
                 tasks.add(new DownloadTrack(cmd.getOptionValue("track"), authToken));
+
+            if (cmd.hasOption("release"))
+                tasks.add(new DownloadAlbum(cmd.getOptionValue("release"), authToken));
 
             if (!tasks.isEmpty()) {
                 for (int i = 0; i < tasks.size(); i++) {

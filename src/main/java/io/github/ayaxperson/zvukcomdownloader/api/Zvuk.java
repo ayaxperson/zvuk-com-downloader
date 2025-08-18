@@ -13,6 +13,7 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicHeader;
 
+import java.io.EOFException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +23,7 @@ import java.util.*;
 public class Zvuk {
 
     private static final String DOWNLOAD_TRACK_TEMPLATE = "{\"query\":\"query getStream($ids: [ID!]!, $quality: String, $encodeType: String, $includeFlacDrm: Boolean!) {\\n  mediaContents(ids: $ids, quality: $quality, encodeType: $encodeType) {\\n    ... on Track {\\n      __typename\\n      stream {\\n        expire\\n        high\\n        mid\\n        flacdrm @include(if: $includeFlacDrm)\\n      }\\n    }\\n    ... on Episode {\\n      __typename\\n      stream {\\n        expire\\n        mid\\n      }\\n    }\\n    ... on Chapter {\\n      __typename\\n      stream {\\n        expire\\n        mid\\n      }\\n    }\\n  }\\n}\",\"variables\":{\"ids\":[%s],\"quality\":\"hq\",\"encodeType\":\"wv\",\"includeFlacDrm\":false},\"operationName\":\"getStream\"}";
-    private static final String FETCH_TRACKS_TEMPLATE = "{\"query\":\"query getArtistCursorPopularTracks($ids: [ID!]!, $limit: Int!, $cursor: String) {\\n  getArtists(ids: $ids) {\\n    title\\n    getCursorPopularTracks(cursor: $cursor, limit: $limit) {\\n      page_info {\\n        hasNextPage\\n        endCursor\\n      }\\n      tracks {\\n        ...PlayerTrackData\\n      }\\n    }\\n  }\\n}\\n\\nfragment PlayerTrackData on Track {\\n  id\\n  title\\n  lyrics\\n  hasFlac\\n  duration\\n  explicit\\n  availability\\n  artistTemplate\\n  childParam\\n  mark\\n  artists {\\n    id\\n    title\\n    image {\\n      src\\n      palette\\n    }\\n    mark\\n    collectionItemData {\\n      itemStatus\\n    }\\n  }\\n  release {\\n    id\\n    title\\n    image {\\n      src\\n      palette\\n    }\\n  }\\n  collectionItemData {\\n    itemStatus\\n  }\\n  zchan\\n  __typename\\n}\",\"variables\":{\"ids\":[\"%s\"],\"limit\":%d,\"cursor\":\"%s\"},\"operationName\":\"getArtistCursorPopularTracks\"}";
+    private static final String FETCH_TRACKS_FROM_PROFILE_TEMPLATE = "{\"query\":\"query getArtistCursorPopularTracks($ids: [ID!]!, $limit: Int!, $cursor: String) {\\n  getArtists(ids: $ids) {\\n    title\\n    getCursorPopularTracks(cursor: $cursor, limit: $limit) {\\n      page_info {\\n        hasNextPage\\n        endCursor\\n      }\\n      tracks {\\n        ...PlayerTrackData\\n      }\\n    }\\n  }\\n}\\n\\nfragment PlayerTrackData on Track {\\n  id\\n  title\\n  lyrics\\n  hasFlac\\n  duration\\n  explicit\\n  availability\\n  artistTemplate\\n  childParam\\n  mark\\n  artists {\\n    id\\n    title\\n    image {\\n      src\\n      palette\\n    }\\n    mark\\n    collectionItemData {\\n      itemStatus\\n    }\\n  }\\n  release {\\n    id\\n    title\\n    image {\\n      src\\n      palette\\n    }\\n  }\\n  collectionItemData {\\n    itemStatus\\n  }\\n  zchan\\n  __typename\\n}\",\"variables\":{\"ids\":[\"%s\"],\"limit\":%d,\"cursor\":\"%s\"},\"operationName\":\"getArtistCursorPopularTracks\"}";
 
     private static final String GRAPHQL_ENDPOINT_URL = "https://zvuk.com/api/v1/graphql";
     private static final String TRACK_INFO_URL = "https://zvuk.com/desktop-data/_next/data/v3.2.2/track/%s.json";
@@ -159,7 +160,34 @@ public class Zvuk {
         }
     }
 
-    public static Track[] fetchTracks(final String id, final String authToken) throws IOException {
+    public static Track[] fetchTracksFromAlbum(final String albumId) throws IOException {
+        final Album album;
+
+        try {
+            album = fetchAlbumInfo(albumId);
+        } catch (final Exception e) {
+            throw new IOException("Failed to fetch album info", e);
+        }
+
+        final ArrayList<Track> tracks = new ArrayList<>(); // Using a list instead of a hard-set array in case some of the track ids are null for some reason
+        for (final String trackId : album.trackIds()) {
+            if (trackId == null)
+                continue;
+
+            final Track track;
+
+            try {
+                track = fetchTrackInfo(trackId);
+            } catch (final Exception e) {
+                throw new IOException(String.format("Failed to fetch track %s", trackId), e);
+            }
+
+            tracks.add(track);
+        }
+        return tracks.toArray(new Track[0]);
+    }
+
+    public static Track[] fetchTracksFromProfile(final String profileId, final String authToken) throws IOException {
         final HttpPost request = new HttpPost(GRAPHQL_ENDPOINT_URL);
         request.setHeaders(getHeaders(authToken));
 
@@ -169,28 +197,28 @@ public class Zvuk {
         String endCursor = null;
 
         while (!finished) {
-            request.setEntity(new StringEntity(String.format(FETCH_TRACKS_TEMPLATE, id, 25, endCursor == null ? "" : endCursor)));
-            final FetchTracksResponse fetchTracksResponse = HTTP_CLIENT.execute(request, new FetchTracksResponseHandler());
-            endCursor = fetchTracksResponse.endCursor;
-            if (!fetchTracksResponse.hasNextPage)
+            request.setEntity(new StringEntity(String.format(FETCH_TRACKS_FROM_PROFILE_TEMPLATE, profileId, 25, endCursor == null ? "" : endCursor)));
+            final FetchTracksFromProfileResponse fetchTracksFromProfileResponse = HTTP_CLIENT.execute(request, new FetchTracksFromProfileResponseHandler());
+            endCursor = fetchTracksFromProfileResponse.endCursor;
+            if (!fetchTracksFromProfileResponse.hasNextPage)
                 finished = true;
 
-            tracks.addAll(Arrays.asList(fetchTracksResponse.tracks));
+            tracks.addAll(Arrays.asList(fetchTracksFromProfileResponse.tracks));
         }
 
         return tracks.toArray(new Track[0]);
     }
 
-    public record FetchTracksResponse(
+    public record FetchTracksFromProfileResponse(
             Track[] tracks,
             boolean hasNextPage,
             String endCursor
     ) { }
 
-    private static class FetchTracksResponseHandler implements HttpClientResponseHandler<FetchTracksResponse> {
+    private static class FetchTracksFromProfileResponseHandler implements HttpClientResponseHandler<FetchTracksFromProfileResponse> {
 
         @Override
-        public FetchTracksResponse handleResponse(ClassicHttpResponse response) throws HttpException, IOException {
+        public FetchTracksFromProfileResponse handleResponse(ClassicHttpResponse response) throws HttpException, IOException {
             final int code = response.getCode();
             final HttpEntity entity = response.getEntity();
 
@@ -242,7 +270,7 @@ public class Zvuk {
                 tracksArray[i] = Track.build((JSONObject) tracksJsonArray.get(i));
             }
 
-            return new FetchTracksResponse(tracksArray, hasNextPage, endCursor);
+            return new FetchTracksFromProfileResponse(tracksArray, hasNextPage, endCursor);
         }
     }
 
