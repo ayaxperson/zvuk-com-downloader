@@ -26,8 +26,8 @@ public class Zvuk {
     private static final String FETCH_TRACKS_FROM_PROFILE_TEMPLATE = "{\"query\":\"query getArtistCursorPopularTracks($ids: [ID!]!, $limit: Int!, $cursor: String) {\\n  getArtists(ids: $ids) {\\n    title\\n    getCursorPopularTracks(cursor: $cursor, limit: $limit) {\\n      page_info {\\n        hasNextPage\\n        endCursor\\n      }\\n      tracks {\\n        ...PlayerTrackData\\n      }\\n    }\\n  }\\n}\\n\\nfragment PlayerTrackData on Track {\\n  id\\n  title\\n  lyrics\\n  hasFlac\\n  duration\\n  explicit\\n  availability\\n  artistTemplate\\n  childParam\\n  mark\\n  artists {\\n    id\\n    title\\n    image {\\n      src\\n      palette\\n    }\\n    mark\\n    collectionItemData {\\n      itemStatus\\n    }\\n  }\\n  release {\\n    id\\n    title\\n    image {\\n      src\\n      palette\\n    }\\n  }\\n  collectionItemData {\\n    itemStatus\\n  }\\n  zchan\\n  __typename\\n}\",\"variables\":{\"ids\":[\"%s\"],\"limit\":%d,\"cursor\":\"%s\"},\"operationName\":\"getArtistCursorPopularTracks\"}";
 
     private static final String GRAPHQL_ENDPOINT_URL = "https://zvuk.com/api/v1/graphql";
-    private static final String TRACK_INFO_URL = "https://zvuk.com/desktop-data/_next/data/v3.2.2/track/%s.json";
-    private static final String ALBUM_INFO_URL = "https://zvuk.com/desktop-data/_next/data/v3.2.2/release/%s.json";
+    private static final String TRACK_INFO_URL = "https://zvuk.com/desktop-data/_next/data/v3.3.1/track/%s.json";
+    private static final String ALBUM_INFO_URL = "https://zvuk.com/desktop-data/_next/data/v3.3.1/release/%s.json";
 
     public static final Map<String, Integer> trackIndexMap = new HashMap<>();
 
