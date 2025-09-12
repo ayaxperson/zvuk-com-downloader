@@ -20,10 +20,10 @@ public class Main {
 
     public static void main(final String[] args) {
         Runtime.getRuntime().addShutdownHook(Thread.ofVirtual().unstarted((() -> {
-            System.out.println("Closing http client");
 
             try {
-                Zvuk.close();
+                if (Zvuk.close())
+                    System.out.println("Closing http client");
             } catch (final Exception e) {
                 System.err.println("Error closing HTTP client (You can probably ignore this)");
                 System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());

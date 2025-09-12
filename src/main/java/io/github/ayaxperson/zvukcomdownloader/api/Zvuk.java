@@ -47,12 +47,19 @@ public class Zvuk {
             "Mozilla/5.0 (Windows NT 10.0; WOW64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/118.0.0.0"
     };
 
-    private static final CloseableHttpClient HTTP_CLIENT = HttpClients.createDefault();
+    private static CloseableHttpClient httpClient;
+    
+    private static CloseableHttpClient getHttpClient() {
+        if (httpClient == null) {
+            httpClient = HttpClients.createDefault();
+        }
+        return httpClient;
+    }
 
     public static Album fetchAlbumInfo(final String id, final String apiVersion) throws IOException {
         final HttpGet request = new HttpGet(String.format(ALBUM_INFO_URL, apiVersion, id));
         request.setHeaders(getHeaders());
-        return HTTP_CLIENT.execute(request, new FetchAlbumInfoResponseHandler());
+        return getHttpClient().execute(request, new FetchAlbumInfoResponseHandler());
     }
 
     public static class FetchAlbumInfoResponseHandler implements HttpClientResponseHandler<Album> {
@@ -105,7 +112,7 @@ public class Zvuk {
     public static Track fetchTrackInfo(final String id, final String apiVersion) throws IOException {
         final HttpGet request = new HttpGet(String.format(TRACK_INFO_URL, apiVersion, id));
         request.setHeaders(getHeaders());
-        return HTTP_CLIENT.execute(request, new FetchTrackInfoResponseHandler(apiVersion));
+        return getHttpClient().execute(request, new FetchTrackInfoResponseHandler(apiVersion));
     }
 
     public record FetchTrackInfoResponseHandler(String apiVersion) implements HttpClientResponseHandler<Track> {
@@ -197,7 +204,7 @@ public class Zvuk {
 
         while (!finished) {
             request.setEntity(new StringEntity(String.format(FETCH_TRACKS_FROM_PROFILE_TEMPLATE, profileId, 25, endCursor == null ? "" : endCursor)));
-            final FetchTracksFromProfileResponse fetchTracksFromProfileResponse = HTTP_CLIENT.execute(request, new FetchTracksFromProfileResponseHandler(apiVersion));
+            final FetchTracksFromProfileResponse fetchTracksFromProfileResponse = getHttpClient().execute(request, new FetchTracksFromProfileResponseHandler(apiVersion));
             endCursor = fetchTracksFromProfileResponse.endCursor;
             if (!fetchTracksFromProfileResponse.hasNextPage)
                 finished = true;
@@ -279,7 +286,7 @@ public class Zvuk {
         request.setEntity(new StringEntity(String.format(DOWNLOAD_TRACK_TEMPLATE, stringsToJsonArray(trackPathMap.keySet().iterator()))));
         request.setHeaders(getHeaders(authToken));
 
-        final String[] tracks = HTTP_CLIENT.execute(request, new FetchTracksURLResponseHandler());
+        final String[] tracks = getHttpClient().execute(request, new FetchTracksURLResponseHandler());
 
         for (final String trackUrl : tracks) {
             final int idStartIndex = trackUrl.indexOf("/track/") + "/track/".length();
@@ -288,7 +295,7 @@ public class Zvuk {
             final String id = trackUrl.substring(idStartIndex, idEndIndex);
             final Path path = trackPathMap.get(id);
 
-            HTTP_CLIENT.execute(new HttpGet(trackUrl), new FileResponseHandler(path));
+            getHttpClient().execute(new HttpGet(trackUrl), new FileResponseHandler(path));
         }
     }
 
@@ -299,8 +306,8 @@ public class Zvuk {
         final HttpPost request = new HttpPost(GRAPHQL_ENDPOINT_URL);
         request.setEntity(new StringEntity(String.format(DOWNLOAD_TRACK_TEMPLATE, String.format("\"%s\"", trackId))));
         request.setHeaders(getHeaders(authToken));
-        final String downloadUrl = HTTP_CLIENT.execute(request, new FetchTrackURLResponseHandler());
-        HTTP_CLIENT.execute(new HttpGet(downloadUrl), new FileResponseHandler(path));
+        final String downloadUrl = getHttpClient().execute(request, new FetchTrackURLResponseHandler());
+        getHttpClient().execute(new HttpGet(downloadUrl), new FileResponseHandler(path));
     }
 
     private record FileResponseHandler(Path path) implements HttpClientResponseHandler<Long> {
@@ -429,7 +436,7 @@ public class Zvuk {
     public static Image downloadImage(final String url) throws IOException {
         final HttpGet request = new HttpGet(url);
         request.setHeaders(getHeaders());
-        return HTTP_CLIENT.execute(request, new ImageResponseHandler());
+        return getHttpClient().execute(request, new ImageResponseHandler());
     }
 
     public static class ImageResponseHandler implements HttpClientResponseHandler<Image> {
@@ -458,8 +465,13 @@ public class Zvuk {
 
     public record Image(byte[] bytes, String mimeType) { }
 
-    public static void close() throws IOException {
-        HTTP_CLIENT.close();
+    public static boolean close() throws IOException {
+        if (httpClient == null)
+            return false;
+
+        httpClient.close();
+
+        return true;
     }
 
     private static Header[] getHeaders() {
