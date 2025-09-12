@@ -43,8 +43,19 @@ jobs:
             --main-jar "$($JAR_PATH.Name)" `
             --win-console
 
-      - name: Upload EXE artifact
-        uses: actions/upload-artifact@v4
+
+      - name: Zip app-image
+        run: |
+          cd dist
+          Compress-Archive -Path ZvukComDownloader -DestinationPath ZvukComDownloader-windows.zip
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        name: "Create release with EXE artifact"
+        if: ${{ github.event.repository.default_branch == github.ref_name && github.event.pull_request == null }}
         with:
-          name: ZvukComDownloader
-          path: dist/*
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: false
+          title: "Latest build"
+          files: |
+            dist/*.zip
