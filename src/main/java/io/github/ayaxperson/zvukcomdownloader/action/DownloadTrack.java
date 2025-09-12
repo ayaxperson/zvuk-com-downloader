@@ -7,7 +7,7 @@ import io.github.ayaxperson.zvukcomdownloader.api.Zvuk;
 
 import java.nio.file.Path;
 
-public record DownloadTrack(String id, String authToken) implements Runnable {
+public record DownloadTrack(String id, String authToken, String apiVersion) implements Runnable {
 
     public void run() {
         System.out.printf("[%s] Downloading temp mp3%n", id);
@@ -21,7 +21,7 @@ public record DownloadTrack(String id, String authToken) implements Runnable {
             return;
         }
 
-        Tracks.fetchTrackDataAndWriteToNewMP3(id, id, tempPath);
+        Tracks.fetchTrackDataAndWriteToNewMP3(id, apiVersion, id, tempPath);
     }
 
 }

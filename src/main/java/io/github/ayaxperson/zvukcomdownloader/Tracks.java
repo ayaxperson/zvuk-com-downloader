@@ -11,11 +11,11 @@ import java.nio.file.Path;
 
 public class Tracks {
 
-    public static void fetchTrackDataAndWriteToNewMP3(final String logPrefix, final String id, final Path path) {
+    public static void fetchTrackDataAndWriteToNewMP3(final String logPrefix, final String apiVersion, final String id, final Path path) {
         System.out.printf("[%s] [%s] Fetching track data%n", logPrefix, id);
         Track trackInfo;
         try {
-            trackInfo = Zvuk.fetchTrackInfo(id);
+            trackInfo = Zvuk.fetchTrackInfo(id, apiVersion);
         } catch (final Exception e) {
             System.err.println("Failed to fetch track data");
             System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
@@ -27,7 +27,7 @@ public class Tracks {
 
         if (albumInfo.limitedData()) {
             try {
-                albumInfo = Zvuk.fetchAlbumInfo(albumInfo.id());
+                albumInfo = Zvuk.fetchAlbumInfo(albumInfo.id(), apiVersion);
             } catch (final Exception e) {
                 System.err.println("Failed to fetch album info");
                 System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());

@@ -12,7 +12,7 @@ public record Track(
         @NotNull Integer position
     ) {
 
-    public static Track build(final JSONObject jsonObject) {
+    public static Track build(final JSONObject jsonObject, final String apiVersion) {
         if (!jsonObject.containsKey("id"))
             throw new IllegalArgumentException("JSON missing required element: id");
 
@@ -54,7 +54,7 @@ public record Track(
                 position = Zvuk.trackIndexMap.get(id);
             } else {
                 try {
-                    Zvuk.fetchAlbumInfo(album.id());
+                    Zvuk.fetchAlbumInfo(album.id(), apiVersion);
                 } catch (final Exception ignored) { }
                 position = Zvuk.trackIndexMap.getOrDefault(id, 1);
             }

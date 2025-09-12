@@ -10,14 +10,14 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public record DownloadDiscography(String id, String authToken) implements Runnable {
+public record DownloadDiscography(String id, String authToken, String apiVersion) implements Runnable {
 
     public void run() {
         System.out.printf("[%s] Fetching tracks%n", id);
         Track[] tracks;
 
         try {
-            tracks = Zvuk.fetchTracksFromProfile(id, authToken);
+            tracks = Zvuk.fetchTracksFromProfile(id, authToken, apiVersion);
         } catch (final Exception e) {
             System.err.printf("[%s] Failed to fetch tracks", id);
             System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
@@ -45,7 +45,7 @@ public record DownloadDiscography(String id, String authToken) implements Runnab
 
         for (final Track track : tracks) {
             // Not reusing the track object here is not a mistake as this track object does not have the necessary data
-            Tracks.fetchTrackDataAndWriteToNewMP3(id, track.id(), trackPathMap.get(track.id()));
+            Tracks.fetchTrackDataAndWriteToNewMP3(id, apiVersion, track.id(), trackPathMap.get(track.id()));
         }
     }
 
