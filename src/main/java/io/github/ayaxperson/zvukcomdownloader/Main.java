@@ -49,21 +49,21 @@ public class Main {
                 .argName("Download track (parameter ID)")
                 .option("t")
                 .longOpt("track")
-                .desc("The ID of the track you want to download (if you want to download a track, that is)")
+                .desc("The ID of a track to download")
                 .hasArg()
                 .build());
         options.addOption(Option.builder()
                 .argName("Download discography (parameter ID)")
                 .option("d")
                 .longOpt("discography")
-                .desc("The ID of the artist you want to download the discography of (if you want to download an artist's discography, that is)")
+                .desc("The ID of an artist whose discography to download")
                 .hasArg()
                 .build());
         options.addOption(Option.builder()
                 .argName("Download release (album) (parameter ID)")
                 .option("r")
                 .longOpt("release")
-                .desc("The ID of the album you want to download (if you want to download an album, that is)")
+                .desc("The ID of a release (album) to download")
                 .hasArg()
                 .build());
         options.addOption(Option.builder()
@@ -78,7 +78,7 @@ public class Main {
                 .argName("API version")
                 .option("v")
                 .longOpt("apiVersion")
-                .desc("Zvuk API Version - Use this if the default is not working. The API version changes frequently and it's possible this utility is not updated so as to reflect it.")
+                .desc("Zvuk API Version to use (use if default does not work)")
                 .hasArg()
                 .build());
 
