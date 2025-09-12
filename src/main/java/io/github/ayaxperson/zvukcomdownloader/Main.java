@@ -29,16 +29,18 @@ public class Main {
                 System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
             }
 
-            System.out.println("Deleting temp files");
+            if (!TEMPORARY_FILES.isEmpty()) {
+                System.out.println("Deleting temp files");
 
-            TEMPORARY_FILES.forEach(path -> {
-                try {
-                    Files.deleteIfExists(path);
-                } catch (IOException e) {
-                    System.err.println("Failed to delete temp file");
-                    System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
-                }
-            });
+                TEMPORARY_FILES.forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (IOException e) {
+                        System.err.println("Failed to delete temp file");
+                        System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+                    }
+                });
+            }
         })));
 
         final Options options = new Options();
