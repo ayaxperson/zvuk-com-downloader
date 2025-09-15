@@ -20,7 +20,7 @@ public record DownloadDiscography(String id, String authToken, String apiVersion
             tracks = Zvuk.fetchTracksFromProfile(id, authToken, apiVersion);
         } catch (final Exception e) {
             System.err.printf("[%s] Failed to fetch tracks%n", id);
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
             return;
         }
 
@@ -39,7 +39,7 @@ public record DownloadDiscography(String id, String authToken, String apiVersion
             Zvuk.downloadTracks(authToken, trackPathMap);
         } catch (final Exception e) {
             System.err.printf("[%s] Failed to download file%n", id);
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
             return;
         }
 

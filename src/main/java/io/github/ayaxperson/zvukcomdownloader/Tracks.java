@@ -18,7 +18,7 @@ public class Tracks {
             trackInfo = Zvuk.fetchTrackInfo(id, apiVersion);
         } catch (final Exception e) {
             System.err.println("Failed to fetch track data");
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
             return;
         }
 
@@ -30,7 +30,7 @@ public class Tracks {
                 albumInfo = Zvuk.fetchAlbumInfo(albumInfo.id(), apiVersion);
             } catch (final Exception e) {
                 System.err.println("Failed to fetch album info");
-                System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+                e.printStackTrace(System.err);
                 return;
             }
         }
@@ -42,7 +42,7 @@ public class Tracks {
             image = Zvuk.downloadImage(Utils.notNull(albumInfo.coverSrc()).replace("{size}", "1000"));
         } catch (final Exception e) {
             System.err.println("Failed to fetch album cover");
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
             return;
         }
 
@@ -53,7 +53,7 @@ public class Tracks {
             mp3File = new Mp3File(path.toFile());
         } catch (final Exception e) {
             System.err.println("Failed to open mp3 file");
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
             return;
         }
 
@@ -75,7 +75,7 @@ public class Tracks {
             mp3File.save(String.format("%s - %s.mp3", trackTag, trackInfo.title()));
         } catch (final Exception e) {
             System.err.println("Failed to save mp3 file");
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 

@@ -26,7 +26,7 @@ public class Main {
                     System.out.println("Closing http client");
             } catch (final Exception e) {
                 System.err.println("Error closing HTTP client (You can probably ignore this)");
-                System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+                e.printStackTrace(System.err);
             }
 
             if (!TEMPORARY_FILES.isEmpty()) {
@@ -37,7 +37,7 @@ public class Main {
                         Files.deleteIfExists(path);
                     } catch (IOException e) {
                         System.err.println("Failed to delete temp file");
-                        System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+                        e.printStackTrace(System.err);
                     }
                 });
             }
@@ -122,7 +122,7 @@ public class Main {
             }
         } catch (final ParseException e) {
             System.err.println("Failed to parse arguments");
-            System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
+            e.printStackTrace(System.err);
             new HelpFormatter().printHelp("Zvuk.com downloader", options);
             System.exit(0);
         }

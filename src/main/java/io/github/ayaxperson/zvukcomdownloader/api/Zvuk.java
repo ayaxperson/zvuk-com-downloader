@@ -172,6 +172,7 @@ public class Zvuk {
         try {
             album = fetchAlbumInfo(albumId, apiVersion);
         } catch (final Exception e) {
+            e.printStackTrace();
             throw new IOException("Failed to fetch album info", e);
         }
 
