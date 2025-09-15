@@ -16,7 +16,7 @@ public record DownloadTrack(String id, String authToken, String apiVersion) impl
         try {
             Zvuk.downloadTrack(authToken, id, tempPath);
         } catch (final Exception e) {
-            System.err.printf("[%s] Failed to download file", id);
+            System.err.printf("[%s] Failed to download file%n", id);
             System.err.printf("%s : %s%n", e.getClass().getSimpleName(), e.getMessage());
             return;
         }
