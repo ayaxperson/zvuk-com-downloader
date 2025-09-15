@@ -5,10 +5,11 @@ A tool for downloading from zvuk.com.
 ### Parameters
 
 ```
--t, track           Download a track (parameter: id)
--d, discography     Download all released tracks of an artist (parameter: id)
--r  release         Download all tracks from a release - album (paramater: id)
--a, authToken       Authentication Token
+ -a,--authToken    Zvuk account authentication token
+ -d,--discography  The ID of an artist whose discography to download
+ -r,--release      The ID of a release (album) to download
+ -t,--track        The ID of a track to download
+ -v,--apiVersion   Zvuk API Version to use (use if default does not work)
 ```
 
 ### Doesn't work?
