@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Main {
 
-    public static final String DEFAULT_API_VERSION = "v3.3.9";
+    public static final String DEFAULT_API_VERSION = "v3.3.10";
 
     public static final List<Path> TEMPORARY_FILES = new ArrayList<>();
 
