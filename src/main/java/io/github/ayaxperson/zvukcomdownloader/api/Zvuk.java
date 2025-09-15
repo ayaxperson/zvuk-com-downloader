@@ -70,15 +70,7 @@ public class Zvuk {
             final HttpEntity entity = response.getEntity();
 
             if (code != 200 || entity == null) {
-                if (code == 418) {
-                    throw new APIException.DetectedBotException();
-                } else {
-                    if (entity != null) {
-                        throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
-                    } else {
-                        throw new APIException(String.format("Unhandled error in response: %d", code));
-                    }
-                }
+                checkResponse(code, entity);
             }
 
             final String jsonSrc = EntityUtils.toString(entity);
@@ -123,15 +115,7 @@ public class Zvuk {
             final HttpEntity entity = response.getEntity();
 
             if (code != 200 || entity == null) {
-                if (code == 418) {
-                    throw new APIException.DetectedBotException();
-                } else {
-                    if (entity != null) {
-                        throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
-                    } else {
-                        throw new APIException(String.format("Unhandled error in response: %d", code));
-                    }
-                }
+                checkResponse(code, entity);
             }
 
             final String jsonSrc = EntityUtils.toString(entity);
@@ -231,15 +215,7 @@ public class Zvuk {
                 final HttpEntity entity = response.getEntity();
 
                 if (code != 200 || entity == null) {
-                    if (code == 418) {
-                        throw new APIException.DetectedBotException();
-                    } else {
-                        if (entity != null) {
-                            throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
-                        } else {
-                            throw new APIException(String.format("Unhandled error in response: %d", code));
-                        }
-                    }
+                    checkResponse(code, entity);
                 }
 
                 final String jsonSrc = EntityUtils.toString(entity);
@@ -319,15 +295,7 @@ public class Zvuk {
             final HttpEntity entity = response.getEntity();
 
             if (code != 200 || entity == null) {
-                if (code == 418) {
-                    throw new APIException.DetectedBotException();
-                } else {
-                    if (entity != null) {
-                        throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
-                    } else {
-                        throw new APIException(String.format("Unhandled error in response: %d", code));
-                    }
-                }
+                checkResponse(code, entity);
             }
 
             try (final FileOutputStream fos = new FileOutputStream(path.toFile())) {
@@ -346,15 +314,7 @@ public class Zvuk {
             final HttpEntity entity = response.getEntity();
 
             if (code != 200 || entity == null) {
-                if (code == 418) {
-                    throw new APIException.DetectedBotException();
-                } else {
-                    if (entity != null) {
-                        throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
-                    } else {
-                        throw new APIException(String.format("Unhandled error in response: %d", code));
-                    }
-                }
+                checkResponse(code, entity);
             }
 
             final String responseAsString = EntityUtils.toString(entity);
@@ -392,15 +352,7 @@ public class Zvuk {
             final HttpEntity entity = response.getEntity();
 
             if (code != 200 || entity == null) {
-                if (code == 418) {
-                    throw new APIException.DetectedBotException();
-                } else {
-                    if (entity != null) {
-                        throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
-                    } else {
-                        throw new APIException(String.format("Unhandled error in response: %d", code));
-                    }
-                }
+                checkResponse(code, entity);
             }
 
             final String responseAsString = EntityUtils.toString(entity);
@@ -431,6 +383,20 @@ public class Zvuk {
 
 
             return result.toArray(new String[0]);
+        }
+    }
+
+    private static void checkResponse(final int code, final HttpEntity entity) throws HttpException, IOException {
+        if (code == 418) {
+            throw new APIException.DetectedBotException();
+        } if (code == 404) {
+            throw new APIException.ItemNotFoundException();
+        } else {
+            if (entity != null) {
+                throw new APIException(String.format("Unhandled error in response: %d : %s", code, EntityUtils.toString(entity)));
+            } else {
+                throw new APIException(String.format("Unhandled error in response (null entity): %d", code));
+            }
         }
     }
 
@@ -537,6 +503,14 @@ public class Zvuk {
 
             public DetectedBotException() {
                 super("You were detected as a bot!");
+            }
+
+        }
+
+        public static class ItemNotFoundException extends APIException {
+
+            public ItemNotFoundException() {
+                super("Requested item not found!");
             }
 
         }
